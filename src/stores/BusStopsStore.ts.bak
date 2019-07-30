@@ -1,0 +1,58 @@
+import { observable, computed, action } from 'mobx';
+import { AsyncStorage } from 'react-native';
+import { IBusStop } from '../models';
+
+export default class BusStopsStore {
+  @observable busStopList: IBusStop[] = [];
+  @observable favoriteBusStopList: IBusStop[] = [];
+
+  get busStops() {
+    return this.busStopList;
+  }
+
+  get favoriteBusStops() {
+    return this.favoriteBusStopList;
+  }
+
+  addBusStops(busStops: IBusStop[]) {
+    this.busStopList = busStops;
+  }
+
+  @action addFavoriteBusStop(busStop: IBusStop) {
+    if (!this.favoriteBusStops.find(bs => bs === busStop))
+      this.favoriteBusStops.push(busStop);
+
+    this.saveFavorites();
+  }
+
+  @action removeFavoriteBusStop(busStop: IBusStop) {
+    this.favoriteBusStopList = this.favoriteBusStops.filter(
+      elem => elem !== busStop
+    );
+
+    this.saveFavorites();
+  }
+
+  async getFavorites() {
+    try {
+      const stringifiedFavoritesBusStops = await AsyncStorage.getItem(
+        '@BusStopStore:favoriteBusStopList'
+      );
+
+      this.favoriteBusStopList = JSON.parse(stringifiedFavoritesBusStops) || [];
+    } catch (e) {
+      console.error('Błąd pobierania favoriteBusStopList z AsyncStorage: ' + e);
+    }
+  }
+
+  async saveFavorites() {
+    try {
+      await AsyncStorage.setItem(
+        '@BusStopStore:favoriteBusStopList',
+        JSON.stringify(this.favoriteBusStopList)
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
