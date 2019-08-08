@@ -32,8 +32,8 @@ class KiedyPrzyjedzie {
           longitude: elem[3],
           location: {
             latitude: elem[4],
-            longitude: elem[3]
-          }
+            longitude: elem[3],
+          },
         };
         BusStops.push(busStop);
       });
@@ -44,12 +44,15 @@ class KiedyPrzyjedzie {
     return BusStops;
   }
 
+  updateCount = 0;
+
   async getBusStopSchedule(busStop: IBusStop): Promise<IBusSchedule[]> {
     let BusSchedule: IBusSchedule[] = [];
     const url: string = `${this.currentCarrier.url}/api/departures/${
       busStop.number
     }`;
-    console.log(url);
+    this.updateCount++;
+    console.log(url, +' ' + this.updateCount);
 
     try {
       const response = await axios.get(url);
@@ -63,7 +66,7 @@ class KiedyPrzyjedzie {
           isEstimated: row.is_estimated,
           lineNumber: row.line_name,
           time: row.time,
-          vehicleType: row.vehicle_type
+          vehicleType: row.vehicle_type,
         };
 
         BusSchedule.push(busSchedule);

@@ -11,32 +11,23 @@ export default class BusStopHeader extends Component {
     console.log('_handleClickFavorite');
 
     const { busStopsStore, busStop } = this.props;
-    const favoriteBusStopList = busStopsStore.favoriteBusStops;
-    console.log(favoriteBusStops);
+    const isFavorite = busStopsStore.favorites.find(f => f === busStop.id);
 
-    const favorite = favoriteBusStopList.find(bs => bs === busStop);
-    console.log('favorite: ' + favorite);
-    busStopsStore.addFavoriteBusStop(busStop);
-
-    // if (!favorite) {
-    // } else {
-    //   favoritesStore.removeFavoriteBusStop(busStop.id);
-    // }
+    if (isFavorite) busStopsStore.removeFavoriteBusStop(busStop.id);
+    else busStopsStore.addFavoriteBusStop(busStop.id);
   };
 
-  dupa = 0;
-
   render() {
-    const { busStopsStore, busStop } = this.props;
-    // await busStopsStore.getFavorites();
-    const favorite = busStopsStore.favoriteBusStops.find(bs => bs === busStop);
+    const { busStopsStore, busStop, loading } = this.props;
+    const favorite = busStopsStore.favorites.find(f => f === busStop.id);
     // const favorite = false;
-    this.dupa += 1;
-    console.log('Header ' + this.dupa);
 
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{busStop.name}</Text>
+        <Text style={styles.title}>
+          {busStop.name} ({busStop.number})
+        </Text>
+        <Text>{loading && 'L'}</Text>
         <TouchableOpacity onPress={this._handleClickFavorite}>
           <Icon name={favorite ? 'star' : 'star-o'} size={20} color="#333333" />
         </TouchableOpacity>
@@ -50,11 +41,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginRight: 10
+    marginRight: 10,
   },
   title: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: 'bold',
-    color: '#333333'
-  }
+    color: '#333333',
+  },
 });

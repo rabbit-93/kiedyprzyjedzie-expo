@@ -6,6 +6,7 @@ export default class BusStopsStore {
   @observable favorites = [];
   @observable searchBusStops = [];
   @observable isSearching = false;
+  @observable searchText = '';
 
   get busStops() {
     console.log('get busStops()');
@@ -22,21 +23,48 @@ export default class BusStopsStore {
     return this.searchBusStops;
   }
 
-  get isSearching() {
+  get searchText() {
+    console.log('get searchText()');
+
+    return this.searchText;
+  }
+
+  set searchText(text) {
+    this.searchText = text;
+  }
+
+  @computed
+  get searching() {
+    console.log('get searching: ' + this.isSearching);
     return this.isSearching;
   }
 
-  @action filterBusStops(text) {
-    // if (!this.favorites.find(id => id === busStopID))
-    //   this.favorites.push(busStopID);
-    // // saveFavorites();
-    console.log('@action filterBusStops');
-    this.isSearching = true;
-
-    this.searchBusStops = this.busStops.filter(bs => bs.name.includes(text));
+  @action
+  setSearching(searching) {
+    this.isSearching = searching;
+    console.log('setSearching: ' + this.isSearching);
   }
 
-  @action closeSearch() {
+  @computed
+  get filteredBusStops() {
+    if (this.searchText === '') {
+      return this.busStops;
+    }
+
+    return this.busStops.filter(
+      bs =>
+        bs.name.includes(this.searchText) ||
+        bs.number === parseInt(this.searchText.trim())
+    );
+  }
+
+  filterBusStops(phrase) {
+    return this.busStops.filter(
+      bs => bs.name.includes(phrase) || bs.number === parseInt(phrase.trim())
+    );
+  }
+
+  closeSearch() {
     console.log('@action closeSearch');
     this.isSearching = false;
   }
@@ -46,13 +74,15 @@ export default class BusStopsStore {
     this.busStops = busStops;
   }
 
-  @action addFavoriteBusStop(busStopID) {
+  @action
+  addFavoriteBusStop(busStopID) {
     if (!this.favorites.find(id => id === busStopID))
       this.favorites.push(busStopID);
     // saveFavorites();
   }
 
-  @action removeFavoriteBusStop(busStopID) {
+  @action
+  removeFavoriteBusStop(busStopID) {
     this.favorites = this.favorites.filter(elem => elem !== busStopID);
     // saveFavorites();
   }
